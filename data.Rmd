@@ -1,0 +1,51 @@
+---
+title: "data.Rmd"
+author: "Richard Zhu"
+date: "4/28/2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+library(tidyverse)
+library(sf)
+library(rnaturalearth)
+library(rnaturalearthdata)
+library(rgeos)
+library(janitor)
+library(broom)
+library(scales)
+library(patchwork)
+library(animation)
+library(gt)
+```
+
+```{r Data processing}
+covid_19_countries <- read_csv("covid-19-data.csv") %>%
+  clean_names() %>%
+  rename(tests = cumulative_tests,
+         tests_pm = cumulative_tests_per_million,
+         cases = total_confirmed_cases_cases,
+         cases_pm = confirmed_cases_per_million_cases_per_million,
+         deaths = total_confirmed_deaths_deaths,
+         deaths_pm = confirmed_deaths_per_million_deaths_per_million,
+         country = entity) %>%
+  mutate(date = as.Date(date, format ="%d-%b-%y"))
+
+continents = c("Africa", "North America", "South America", "Asia", "Europe", "Australia")
+incomes = c("Low income", "Lower middle income", "Upper middle income", "High income")
+continent_graph_data <- covid_19_countries %>%
+  filter(country %in% continents)
+continent_graph_data %>%
+  ggplot(aes(x = date, y = cases, group = country, color = country)) +
+  geom_line() + 
+  theme_classic()
+
+income_graph_data <- covid_19_countries %>%
+  filter(country %in% incomes)
+income_graph_data %>%
+  ggplot(aes(x = date, y = cases, group = country, color = country)) +
+  geom_line() + 
+  theme_classic()
+```
+
